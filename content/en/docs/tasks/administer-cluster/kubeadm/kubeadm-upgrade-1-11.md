@@ -229,6 +229,17 @@ To keep `kube-dns`, pass `--feature-gates=CoreDNS=false` to `kubeadm upgrade app
     sudo kubeadm upgrade node config --kubelet-version $(kubelet --version | cut -d ' ' -f 2)
     ```
 
+1.  Starting with 1.11, every node should have a file with environment-specific `kubelet` flags, which is normally created by the `init`/`join` commands. This file was created automatically when upgrading the master node, but not when upgrading the worker nodes. On each node except the master node, create it to contain the old 1.10 defaults:
+
+    {{< tabs name="create_kubeadm-flags" >}}
+    {{% tab name="Ubuntu, Debian or HypriotOS" %}}
+    sudo echo "KUBELET_KUBEADM_ARGS=--cgroup-driver=cgroupfs --cni-bin-dir=/opt/cni/bin --cni-conf-dir=/etc/cni/net.d --network-plugin=cni" > /var/lib/kubelet/kubeadm-flags.env
+    {{% /tab %}}
+    {{% tab name="CentOS, RHEL or Fedora" %}}
+    sudo echo "KUBELET_KUBEADM_ARGS=--cgroup-driver=systemd --cni-bin-dir=/opt/cni/bin --cni-conf-dir=/etc/cni/net.d --network-plugin=cni" > /var/lib/kubelet/kubeadm-flags.env
+    {{% /tab %}}
+    {{< /tabs >}}
+
 1.  Restart the kubectl process:
 
     ```shell
